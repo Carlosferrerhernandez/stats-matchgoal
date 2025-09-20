@@ -7,7 +7,17 @@ use Illuminate\Database\Eloquent\Model;
 
 class Bet extends Model
 {
-    protected $fillable = ['user_id', 'channel_id', 'amount', 'odds', 'result'];
+    protected $fillable = [
+        'user_id',
+        'league_id',
+        'team_id',
+        'channel_id',
+        'achievement',
+        'amount',
+        'odds',
+        'stake',
+        'result'
+    ];
 
     public function channel()
     {
@@ -18,6 +28,22 @@ class Bet extends Model
     {
         return $this->belongsTo(User::class);
     }
+
+    public function league()
+    {
+        return $this->belongsTo(League::class);
+    }
+
+    public function team()
+    {
+        return $this->belongsTo(Team::class);
+    }
+
+    protected $casts = [
+        'amount' => 'decimal:2',
+        'odds' => 'decimal:2',
+        'result' => 'boolean',
+    ];
 
     public function calculateProfit()
     {
