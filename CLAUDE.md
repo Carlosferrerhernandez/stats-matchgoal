@@ -77,16 +77,21 @@ matchgoal/
 - Gestión de perfil
 
 ### Funcionalidades Principales de la Aplicación
-1. **Sistema de Apuestas**: Crear y gestionar predicciones de apuestas
-2. **Gestión de Ligas**: Crear y organizar ligas deportivas
+1. **Sistema de Predicciones Deportivas**: Crear y gestionar predicciones de apuestas con algoritmo de análisis automático
+2. **Gestión de Ligas**: Crear y organizar ligas deportivas con datos reales
 3. **Gestión de Equipos**: Gestionar información y estadísticas de equipos
-4. **Dashboard**: Panel de usuario autenticado
+4. **Sistema de Creación de Partidos**: Workflow de 6 pasos para análisis predictivo
+5. **Dashboard**: Panel de usuario autenticado con estadísticas
 
 ### Modelos de Base de Datos
 - **User**: Modelo de usuario estándar de Laravel con tokens API
 - **Bet**: Predicciones de apuestas y datos relacionados
-- **League**: Información de ligas deportivas
-- **Team**: Datos de equipos y relaciones
+- **League**: Información de ligas deportivas con descripciones
+- **Team**: Datos de equipos (ciudad, año fundación, descripción) y relaciones
+- **FootballMatch**: Partidos de fútbol con equipos local/visitante
+- **Prediction**: Predicciones generadas por el algoritmo de análisis
+- **TeamStat**: Estadísticas de equipos por liga y temporada
+- **UserSetting**: Configuraciones de usuario (stakes, bankroll)
 - **Channel**: Canales de comunicación o transmisión
 
 ## Comandos de Desarrollo
@@ -179,8 +184,9 @@ Variables clave en `.env`:
 - `/profile/*`: Gestión de perfil
 - `/predictions`: Ver predicciones de apuestas
 - `/bets/*`: Gestión de apuestas
-- `/leagues/*`: Gestión de ligas
-- `/teams/*`: Gestión de equipos
+- `/leagues/*`: Gestión de ligas (CRUD completo)
+- `/teams/*`: Gestión de equipos (CRUD completo)
+- `/matches/create/*`: Workflow de 6 pasos para crear partidos con análisis predictivo
 
 ### Rutas de Autenticación
 - Manejadas por Laravel Breeze
@@ -257,5 +263,72 @@ php artisan migrate --force
 - **main**: Rama de producción
 - **development**: Rama de desarrollo actual
 - Las ramas de funcionalidades deben crearse desde `development`
+
+## Sistema de Predicciones Deportivas
+
+### Workflow de Creación de Partidos (6 Pasos)
+1. **Paso 1**: Selección de liga y equipos (local y visitante) con fecha del partido
+2. **Paso 2**: Porcentajes de victoria (local, empate, visitante) - deben sumar 100%
+3. **Paso 3**: Estadísticas del equipo local con rachas simples y formato X/Y
+4. **Paso 4**: Estadísticas del equipo visitante con rachas simples y formato X/Y
+5. **Paso 5**: Cuotas de mercados activos para análisis predictivo
+6. **Paso 6**: Análisis automático y confirmación del partido
+
+### Tipos de Estadísticas de Equipos
+
+#### Rachas Simples (Número consecutivo)
+- **Racha de Victorias**: Número de victorias consecutivas
+- **Racha de Derrotas**: Número de derrotas consecutivas
+- **Racha Sin Derrotas**: Número de partidos consecutivos sin perder
+- **Ninguna Portería a Cero**: Número de partidos consecutivos sin portería imbatida
+
+#### Rachas con Formato (Aciertos/Total)
+- **Primero en Marcar**: X/Y partidos donde el equipo anota primero
+- **Ganador Primer Tiempo**: X/Y partidos donde gana el primer tiempo
+- **Ambos Equipos Anotan**: X/Y partidos donde ambos equipos anotan
+- **Más de 2.5 Goles**: X/Y partidos con más de 2.5 goles totales
+- **Menos de 2.5 Goles**: X/Y partidos con menos de 2.5 goles totales
+
+### Algoritmo de Análisis
+- **MarketAnalysisService**: Servicio que analiza las estadísticas de ambos equipos
+- **Mercados Analizados**: 1X2, Primer Gol, Ganador Primer Tiempo, Ambos Anotan, Over/Under 2.5
+- **Scoring de Confianza**: Basado en la efectividad de las rachas y consistencia
+- **Cálculo ROI**: Retorno de inversión estimado por apuesta
+- **Guardar Siempre**: Los partidos se guardan independientemente de si se genera predicción
+
+### Sistema de Stakes (Apuestas)
+- **Unidad Base**: 5,000 COP por unidad
+- **Escalas**: 1-4 unidades según confianza
+- **Configuración**: Ajustable por usuario vía UserSettings
+
+### Datos Reales Incluidos
+- **LaLiga EA Sports**: 12 equipos principales
+- **Premier League**: 8 equipos principales
+- **Serie A TIM**: 8 equipos principales
+- **Bundesliga**: 8 equipos principales
+
+Cada equipo incluye: nombre, ciudad, año de fundación, y descripción.
+
+## Últimas Actualizaciones (Septiembre 2025)
+
+### Mejoras en el Sistema de Estadísticas
+- **Campos Reorganizados**: Se reorganizó la estructura de campos en pasos 3 y 4 para ser más intuitivos
+- **Nuevos Campos Agregados**:
+  - "Menos de 2.5 Goles" en formato X/Y
+  - "Ninguna Portería a Cero" como racha simple
+- **Cambios de Nomenclatura**: "Primer Gol" cambió a "Primero en Marcar"
+- **Validación Mejorada**: Todos los campos son opcionales (nullable) para mayor flexibilidad
+
+### Mejoras en el Flujo de Creación
+- **Guardar Sin Predicción**: Los partidos ahora se guardan siempre, independientemente de si se genera predicción
+- **Mensajes Personalizados**: Diferentes mensajes de éxito según si hay predicción o no
+- **Manejo de Errores**: Mejor gestión de errores en el análisis predictivo
+- **Botón Adicional**: Opción "Guardar Partido Sin Predicción" cuando no hay análisis disponible
+
+### Archivos Modificados
+- `resources/views/matches/create/step3.blade.php`: Campos reorganizados y nuevos campos
+- `resources/views/matches/create/step4.blade.php`: Mismas mejoras para equipo visitante
+- `resources/views/matches/create/analyze.blade.php`: Botón adicional y mejor manejo de predicciones
+- `app/Http/Controllers/MatchCreatorController.php`: Validaciones opcionales y lógica mejorada
 
 Esta documentación proporciona una visión completa de la estructura del proyecto MatchGoal, configuración y flujo de trabajo de desarrollo.

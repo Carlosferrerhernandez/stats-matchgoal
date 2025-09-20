@@ -186,6 +186,22 @@
                                     💰 Revisar Cuotas
                                 </a>
                             </div>
+
+                            <!-- Guardar partido sin predicción -->
+                            <div class="mt-6 flex justify-center">
+                                <form method="POST" action="{{ route('matches.create.confirm') }}" class="inline">
+                                    @csrf
+                                    <button type="submit" class="bg-gray-600 hover:bg-gray-800 text-white font-bold py-3 px-6 rounded-lg text-lg">
+                                        💾 Guardar Partido Sin Predicción
+                                    </button>
+                                </form>
+                            </div>
+
+                            <div class="mt-4 text-center">
+                                <p class="text-sm text-gray-600">
+                                    El partido se guardará con los datos introducidos para futuras referencias, pero sin una predicción automática.
+                                </p>
+                            </div>
                         </div>
                     @endif
 
@@ -199,22 +215,68 @@
 
                             @if(isset($matchData['home_stats']))
                                 <div class="space-y-3">
-                                    <div class="flex justify-between">
-                                        <span class="text-blue-700">Primer Gol:</span>
-                                        <span class="font-medium">{{ $matchData['home_stats']['home_first_to_score_success'] }}/{{ $matchData['home_stats']['home_first_to_score_total'] }}</span>
-                                    </div>
-                                    <div class="flex justify-between">
-                                        <span class="text-blue-700">1T Ganador:</span>
-                                        <span class="font-medium">{{ $matchData['home_stats']['home_first_half_winner_success'] }}/{{ $matchData['home_stats']['home_first_half_winner_total'] }}</span>
-                                    </div>
-                                    <div class="flex justify-between">
-                                        <span class="text-blue-700">Ambos Anotan:</span>
-                                        <span class="font-medium">{{ $matchData['home_stats']['home_both_teams_score_success'] }}/{{ $matchData['home_stats']['home_both_teams_score_total'] }}</span>
-                                    </div>
-                                    @if($matchData['home_stats']['home_no_defeats_total'])
+                                    <!-- Rachas Simples -->
+                                    @if(!empty($matchData['home_stats']['home_wins_streak']))
                                         <div class="flex justify-between">
-                                            <span class="text-blue-700">Sin Derrotas:</span>
-                                            <span class="font-medium">{{ $matchData['home_stats']['home_no_defeats_success'] }}/{{ $matchData['home_stats']['home_no_defeats_total'] }}</span>
+                                            <span class="text-blue-700">🏆 Victorias:</span>
+                                            <span class="font-medium">{{ $matchData['home_stats']['home_wins_streak'] }} consecutivas</span>
+                                        </div>
+                                    @endif
+
+                                    @if(!empty($matchData['home_stats']['home_defeats_streak']))
+                                        <div class="flex justify-between">
+                                            <span class="text-blue-700">❌ Derrotas:</span>
+                                            <span class="font-medium">{{ $matchData['home_stats']['home_defeats_streak'] }} consecutivas</span>
+                                        </div>
+                                    @endif
+
+                                    @if(!empty($matchData['home_stats']['home_no_defeats_streak']))
+                                        <div class="flex justify-between">
+                                            <span class="text-blue-700">🛡️ Sin Derrotas:</span>
+                                            <span class="font-medium">{{ $matchData['home_stats']['home_no_defeats_streak'] }} partidos</span>
+                                        </div>
+                                    @endif
+
+                                    @if(!empty($matchData['home_stats']['home_no_clean_sheet_streak']))
+                                        <div class="flex justify-between">
+                                            <span class="text-blue-700">🥅 Sin Portería Cero:</span>
+                                            <span class="font-medium">{{ $matchData['home_stats']['home_no_clean_sheet_streak'] }} partidos</span>
+                                        </div>
+                                    @endif
+
+                                    <!-- Rachas con Formato -->
+                                    @if(!empty($matchData['home_stats']['home_first_to_score_total']))
+                                        <div class="flex justify-between">
+                                            <span class="text-blue-700">⚽ Primero en Marcar:</span>
+                                            <span class="font-medium">{{ $matchData['home_stats']['home_first_to_score_success'] }}/{{ $matchData['home_stats']['home_first_to_score_total'] }}</span>
+                                        </div>
+                                    @endif
+
+                                    @if(!empty($matchData['home_stats']['home_first_half_winner_total']))
+                                        <div class="flex justify-between">
+                                            <span class="text-blue-700">🏁 1T Ganador:</span>
+                                            <span class="font-medium">{{ $matchData['home_stats']['home_first_half_winner_success'] }}/{{ $matchData['home_stats']['home_first_half_winner_total'] }}</span>
+                                        </div>
+                                    @endif
+
+                                    @if(!empty($matchData['home_stats']['home_both_teams_score_total']))
+                                        <div class="flex justify-between">
+                                            <span class="text-blue-700">⚽⚽ Ambos Anotan:</span>
+                                            <span class="font-medium">{{ $matchData['home_stats']['home_both_teams_score_success'] }}/{{ $matchData['home_stats']['home_both_teams_score_total'] }}</span>
+                                        </div>
+                                    @endif
+
+                                    @if(!empty($matchData['home_stats']['home_over_25_total']))
+                                        <div class="flex justify-between">
+                                            <span class="text-blue-700">📈 Más de 2.5:</span>
+                                            <span class="font-medium">{{ $matchData['home_stats']['home_over_25_success'] }}/{{ $matchData['home_stats']['home_over_25_total'] }}</span>
+                                        </div>
+                                    @endif
+
+                                    @if(!empty($matchData['home_stats']['home_under_25_total']))
+                                        <div class="flex justify-between">
+                                            <span class="text-blue-700">📉 Menos de 2.5:</span>
+                                            <span class="font-medium">{{ $matchData['home_stats']['home_under_25_success'] }}/{{ $matchData['home_stats']['home_under_25_total'] }}</span>
                                         </div>
                                     @endif
                                 </div>
@@ -229,30 +291,68 @@
 
                             @if(isset($matchData['away_stats']))
                                 <div class="space-y-3">
-                                    <div class="flex justify-between">
-                                        <span class="text-purple-700">Primer Gol:</span>
-                                        <span class="font-medium">{{ $matchData['away_stats']['away_first_to_score_success'] }}/{{ $matchData['away_stats']['away_first_to_score_total'] }}</span>
-                                    </div>
-                                    <div class="flex justify-between">
-                                        <span class="text-purple-700">1er Gol Contra:</span>
-                                        <span class="font-medium">{{ $matchData['away_stats']['away_first_to_concede_success'] }}/{{ $matchData['away_stats']['away_first_to_concede_total'] }}</span>
-                                    </div>
-                                    <div class="flex justify-between">
-                                        <span class="text-purple-700">1T Ganador:</span>
-                                        <span class="font-medium">{{ $matchData['away_stats']['away_first_half_winner_success'] }}/{{ $matchData['away_stats']['away_first_half_winner_total'] }}</span>
-                                    </div>
-                                    <div class="flex justify-between">
-                                        <span class="text-purple-700">1T Perdedor:</span>
-                                        <span class="font-medium">{{ $matchData['away_stats']['away_first_half_loser_success'] }}/{{ $matchData['away_stats']['away_first_half_loser_total'] }}</span>
-                                    </div>
-                                    <div class="flex justify-between">
-                                        <span class="text-purple-700">Ambos Anotan:</span>
-                                        <span class="font-medium">{{ $matchData['away_stats']['away_both_teams_score_success'] }}/{{ $matchData['away_stats']['away_both_teams_score_total'] }}</span>
-                                    </div>
-                                    @if($matchData['away_stats']['away_no_wins_total'])
+                                    <!-- Rachas Simples -->
+                                    @if(!empty($matchData['away_stats']['away_wins_streak']))
                                         <div class="flex justify-between">
-                                            <span class="text-purple-700">Sin Victorias:</span>
-                                            <span class="font-medium">{{ $matchData['away_stats']['away_no_wins_success'] }}/{{ $matchData['away_stats']['away_no_wins_total'] }}</span>
+                                            <span class="text-purple-700">🏆 Victorias:</span>
+                                            <span class="font-medium">{{ $matchData['away_stats']['away_wins_streak'] }} consecutivas</span>
+                                        </div>
+                                    @endif
+
+                                    @if(!empty($matchData['away_stats']['away_defeats_streak']))
+                                        <div class="flex justify-between">
+                                            <span class="text-purple-700">❌ Derrotas:</span>
+                                            <span class="font-medium">{{ $matchData['away_stats']['away_defeats_streak'] }} consecutivas</span>
+                                        </div>
+                                    @endif
+
+                                    @if(!empty($matchData['away_stats']['away_no_defeats_streak']))
+                                        <div class="flex justify-between">
+                                            <span class="text-purple-700">🛡️ Sin Derrotas:</span>
+                                            <span class="font-medium">{{ $matchData['away_stats']['away_no_defeats_streak'] }} partidos</span>
+                                        </div>
+                                    @endif
+
+                                    @if(!empty($matchData['away_stats']['away_no_clean_sheet_streak']))
+                                        <div class="flex justify-between">
+                                            <span class="text-purple-700">🥅 Sin Portería Cero:</span>
+                                            <span class="font-medium">{{ $matchData['away_stats']['away_no_clean_sheet_streak'] }} partidos</span>
+                                        </div>
+                                    @endif
+
+                                    <!-- Rachas con Formato -->
+                                    @if(!empty($matchData['away_stats']['away_first_to_score_total']))
+                                        <div class="flex justify-between">
+                                            <span class="text-purple-700">⚽ Primero en Marcar:</span>
+                                            <span class="font-medium">{{ $matchData['away_stats']['away_first_to_score_success'] }}/{{ $matchData['away_stats']['away_first_to_score_total'] }}</span>
+                                        </div>
+                                    @endif
+
+                                    @if(!empty($matchData['away_stats']['away_first_half_winner_total']))
+                                        <div class="flex justify-between">
+                                            <span class="text-purple-700">🏁 1T Ganador:</span>
+                                            <span class="font-medium">{{ $matchData['away_stats']['away_first_half_winner_success'] }}/{{ $matchData['away_stats']['away_first_half_winner_total'] }}</span>
+                                        </div>
+                                    @endif
+
+                                    @if(!empty($matchData['away_stats']['away_both_teams_score_total']))
+                                        <div class="flex justify-between">
+                                            <span class="text-purple-700">⚽⚽ Ambos Anotan:</span>
+                                            <span class="font-medium">{{ $matchData['away_stats']['away_both_teams_score_success'] }}/{{ $matchData['away_stats']['away_both_teams_score_total'] }}</span>
+                                        </div>
+                                    @endif
+
+                                    @if(!empty($matchData['away_stats']['away_over_25_total']))
+                                        <div class="flex justify-between">
+                                            <span class="text-purple-700">📈 Más de 2.5:</span>
+                                            <span class="font-medium">{{ $matchData['away_stats']['away_over_25_success'] }}/{{ $matchData['away_stats']['away_over_25_total'] }}</span>
+                                        </div>
+                                    @endif
+
+                                    @if(!empty($matchData['away_stats']['away_under_25_total']))
+                                        <div class="flex justify-between">
+                                            <span class="text-purple-700">📉 Menos de 2.5:</span>
+                                            <span class="font-medium">{{ $matchData['away_stats']['away_under_25_success'] }}/{{ $matchData['away_stats']['away_under_25_total'] }}</span>
                                         </div>
                                     @endif
                                 </div>

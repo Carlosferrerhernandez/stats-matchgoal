@@ -1,7 +1,7 @@
 <x-app-layout>
     <x-slot name="header">
         <h2 class="font-semibold text-xl text-gray-800 leading-tight">
-            {{ __('Crear Partido - Paso 4: Rachas Equipo Visitante') }}
+            {{ __('Crear Partido - Paso 4: Estadísticas Equipo Visitante') }}
         </h2>
     </x-slot>
 
@@ -26,7 +26,7 @@
                         <div class="flex justify-center items-center">
                             <div class="text-center">
                                 <div class="font-bold text-xl text-purple-800">✈️ {{ $awayTeam->name }}</div>
-                                <div class="text-sm text-purple-600">Equipo Visitante - Rachas y Estadísticas</div>
+                                <div class="text-sm text-purple-600">Estadísticas Generales del Equipo</div>
                             </div>
                         </div>
                     </div>
@@ -38,208 +38,253 @@
                                 @csrf
 
                                 <div class="space-y-6">
-                                    <!-- First to Score (Away) -->
-                                    <div class="bg-white border border-gray-200 rounded-lg p-4">
+                                    <!-- Simple Streaks Section -->
+                                    <div class="bg-gradient-to-r from-green-50 to-purple-50 p-4 rounded-lg border">
                                         <h3 class="font-semibold text-gray-800 mb-4 flex items-center">
-                                            ⚽ Primer Gol (Visitante)
+                                            📊 Rachas Simples (Número de partidos consecutivos)
                                         </h3>
+
                                         <div class="grid grid-cols-2 gap-4">
                                             <div>
-                                                <label for="away_first_to_score_success" class="block text-sm font-medium text-gray-700 mb-1">
-                                                    Aciertos
+                                                <label for="away_wins_streak" class="block text-sm font-medium text-gray-700 mb-1">
+                                                    🏆 Racha de Victorias
                                                 </label>
-                                                <input type="number" name="away_first_to_score_success" id="away_first_to_score_success"
-                                                       min="0" required value="{{ old('away_first_to_score_success') }}"
+                                                <input type="number" name="away_wins_streak" id="away_wins_streak"
+                                                       min="0" value="{{ old('away_wins_streak') }}"
+                                                       placeholder="ej: 2 (2 victorias seguidas)"
                                                        class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-purple-500 focus:border-purple-500">
-                                                @error('away_first_to_score_success')
+                                                @error('away_wins_streak')
                                                     <p class="mt-1 text-xs text-red-600">{{ $message }}</p>
                                                 @enderror
                                             </div>
+
                                             <div>
-                                                <label for="away_first_to_score_total" class="block text-sm font-medium text-gray-700 mb-1">
-                                                    Total Partidos
+                                                <label for="away_defeats_streak" class="block text-sm font-medium text-gray-700 mb-1">
+                                                    ❌ Racha de Derrotas
                                                 </label>
-                                                <input type="number" name="away_first_to_score_total" id="away_first_to_score_total"
-                                                       min="1" required value="{{ old('away_first_to_score_total') }}"
+                                                <input type="number" name="away_defeats_streak" id="away_defeats_streak"
+                                                       min="0" value="{{ old('away_defeats_streak') }}"
+                                                       placeholder="ej: 1 (1 derrota reciente)"
                                                        class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-purple-500 focus:border-purple-500">
-                                                @error('away_first_to_score_total')
+                                                @error('away_defeats_streak')
                                                     <p class="mt-1 text-xs text-red-600">{{ $message }}</p>
                                                 @enderror
                                             </div>
                                         </div>
-                                        <div class="mt-2 text-sm text-gray-500" id="away_first_score_percentage">
-                                            Efectividad: -
+
+                                        <div class="mt-4">
+                                            <label for="away_no_defeats_streak" class="block text-sm font-medium text-gray-700 mb-1">
+                                                🛡️ Racha Sin Derrotas
+                                            </label>
+                                            <input type="number" name="away_no_defeats_streak" id="away_no_defeats_streak"
+                                                   min="0" value="{{ old('away_no_defeats_streak') }}"
+                                                   placeholder="ej: 4 (4 partidos sin perder)"
+                                                   class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-purple-500 focus:border-purple-500">
+                                            @error('away_no_defeats_streak')
+                                                <p class="mt-1 text-xs text-red-600">{{ $message }}</p>
+                                            @enderror
+                                        </div>
+
+                                        <div class="mt-4">
+                                            <label for="away_no_clean_sheet_streak" class="block text-sm font-medium text-gray-700 mb-1">
+                                                🥅 Ninguna Portería a Cero
+                                            </label>
+                                            <input type="number" name="away_no_clean_sheet_streak" id="away_no_clean_sheet_streak"
+                                                   min="0" value="{{ old('away_no_clean_sheet_streak') }}"
+                                                   placeholder="ej: 3 (3 partidos sin portería imbatida)"
+                                                   class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-purple-500 focus:border-purple-500">
+                                            @error('away_no_clean_sheet_streak')
+                                                <p class="mt-1 text-xs text-red-600">{{ $message }}</p>
+                                            @enderror
                                         </div>
                                     </div>
 
-                                    <!-- First to Concede (Away) -->
-                                    <div class="bg-white border border-gray-200 rounded-lg p-4">
+                                    <!-- Ratio Streaks Section -->
+                                    <div class="bg-gradient-to-r from-yellow-50 to-red-50 p-4 rounded-lg border">
                                         <h3 class="font-semibold text-gray-800 mb-4 flex items-center">
-                                            🥅 Primer Gol en Contra (Visitante)
+                                            🎯 Rachas con Formato (Aciertos/Total)
                                         </h3>
-                                        <div class="grid grid-cols-2 gap-4">
-                                            <div>
-                                                <label for="away_first_to_concede_success" class="block text-sm font-medium text-gray-700 mb-1">
-                                                    Aciertos
-                                                </label>
-                                                <input type="number" name="away_first_to_concede_success" id="away_first_to_concede_success"
-                                                       min="0" required value="{{ old('away_first_to_concede_success') }}"
-                                                       class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-purple-500 focus:border-purple-500">
-                                                @error('away_first_to_concede_success')
-                                                    <p class="mt-1 text-xs text-red-600">{{ $message }}</p>
-                                                @enderror
-                                            </div>
-                                            <div>
-                                                <label for="away_first_to_concede_total" class="block text-sm font-medium text-gray-700 mb-1">
-                                                    Total Partidos
-                                                </label>
-                                                <input type="number" name="away_first_to_concede_total" id="away_first_to_concede_total"
-                                                       min="1" required value="{{ old('away_first_to_concede_total') }}"
-                                                       class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-purple-500 focus:border-purple-500">
-                                                @error('away_first_to_concede_total')
-                                                    <p class="mt-1 text-xs text-red-600">{{ $message }}</p>
-                                                @enderror
-                                            </div>
-                                        </div>
-                                        <div class="mt-2 text-sm text-gray-500" id="away_first_concede_percentage">
-                                            Efectividad: -
-                                        </div>
-                                    </div>
 
-                                    <!-- First Half Winner (Away) -->
-                                    <div class="bg-white border border-gray-200 rounded-lg p-4">
-                                        <h3 class="font-semibold text-gray-800 mb-4 flex items-center">
-                                            🏁 Ganador Primer Tiempo (Visitante)
-                                        </h3>
-                                        <div class="grid grid-cols-2 gap-4">
-                                            <div>
-                                                <label for="away_first_half_winner_success" class="block text-sm font-medium text-gray-700 mb-1">
-                                                    Aciertos
-                                                </label>
-                                                <input type="number" name="away_first_half_winner_success" id="away_first_half_winner_success"
-                                                       min="0" required value="{{ old('away_first_half_winner_success') }}"
-                                                       class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-purple-500 focus:border-purple-500">
-                                                @error('away_first_half_winner_success')
-                                                    <p class="mt-1 text-xs text-red-600">{{ $message }}</p>
-                                                @enderror
+                                        <!-- First to Score -->
+                                        <div class="bg-white border border-gray-200 rounded-lg p-4 mb-4">
+                                            <h4 class="font-medium text-gray-800 mb-3 flex items-center">
+                                                ⚽ Primero en Marcar
+                                            </h4>
+                                            <div class="grid grid-cols-2 gap-4">
+                                                <div>
+                                                    <label for="away_first_to_score_success" class="block text-sm font-medium text-gray-700 mb-1">
+                                                        Aciertos
+                                                    </label>
+                                                    <input type="number" name="away_first_to_score_success" id="away_first_to_score_success"
+                                                           min="0" value="{{ old('away_first_to_score_success') }}"
+                                                           placeholder="opcional"
+                                                           class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-purple-500 focus:border-purple-500">
+                                                    @error('away_first_to_score_success')
+                                                        <p class="mt-1 text-xs text-red-600">{{ $message }}</p>
+                                                    @enderror
+                                                </div>
+                                                <div>
+                                                    <label for="away_first_to_score_total" class="block text-sm font-medium text-gray-700 mb-1">
+                                                        Total Partidos
+                                                    </label>
+                                                    <input type="number" name="away_first_to_score_total" id="away_first_to_score_total"
+                                                           min="0" value="{{ old('away_first_to_score_total') }}"
+                                                           placeholder="opcional"
+                                                           class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-purple-500 focus:border-purple-500">
+                                                    @error('away_first_to_score_total')
+                                                        <p class="mt-1 text-xs text-red-600">{{ $message }}</p>
+                                                    @enderror
+                                                </div>
                                             </div>
-                                            <div>
-                                                <label for="away_first_half_winner_total" class="block text-sm font-medium text-gray-700 mb-1">
-                                                    Total Partidos
-                                                </label>
-                                                <input type="number" name="away_first_half_winner_total" id="away_first_half_winner_total"
-                                                       min="1" required value="{{ old('away_first_half_winner_total') }}"
-                                                       class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-purple-500 focus:border-purple-500">
-                                                @error('away_first_half_winner_total')
-                                                    <p class="mt-1 text-xs text-red-600">{{ $message }}</p>
-                                                @enderror
+                                            <div class="mt-2 text-sm text-gray-500" id="away_first_score_percentage">
+                                                Efectividad: -
                                             </div>
                                         </div>
-                                        <div class="mt-2 text-sm text-gray-500" id="away_first_half_winner_percentage">
-                                            Efectividad: -
-                                        </div>
-                                    </div>
 
-                                    <!-- First Half Loser (Away) -->
-                                    <div class="bg-white border border-gray-200 rounded-lg p-4">
-                                        <h3 class="font-semibold text-gray-800 mb-4 flex items-center">
-                                            📉 Perdedor Primer Tiempo (Visitante)
-                                        </h3>
-                                        <div class="grid grid-cols-2 gap-4">
-                                            <div>
-                                                <label for="away_first_half_loser_success" class="block text-sm font-medium text-gray-700 mb-1">
-                                                    Aciertos
-                                                </label>
-                                                <input type="number" name="away_first_half_loser_success" id="away_first_half_loser_success"
-                                                       min="0" required value="{{ old('away_first_half_loser_success') }}"
-                                                       class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-purple-500 focus:border-purple-500">
-                                                @error('away_first_half_loser_success')
-                                                    <p class="mt-1 text-xs text-red-600">{{ $message }}</p>
-                                                @enderror
+                                        <!-- First Half Winner -->
+                                        <div class="bg-white border border-gray-200 rounded-lg p-4 mb-4">
+                                            <h4 class="font-medium text-gray-800 mb-3 flex items-center">
+                                                🏁 Ganador Primer Tiempo
+                                            </h4>
+                                            <div class="grid grid-cols-2 gap-4">
+                                                <div>
+                                                    <label for="away_first_half_winner_success" class="block text-sm font-medium text-gray-700 mb-1">
+                                                        Aciertos
+                                                    </label>
+                                                    <input type="number" name="away_first_half_winner_success" id="away_first_half_winner_success"
+                                                           min="0" value="{{ old('away_first_half_winner_success') }}"
+                                                           placeholder="opcional"
+                                                           class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-purple-500 focus:border-purple-500">
+                                                    @error('away_first_half_winner_success')
+                                                        <p class="mt-1 text-xs text-red-600">{{ $message }}</p>
+                                                    @enderror
+                                                </div>
+                                                <div>
+                                                    <label for="away_first_half_winner_total" class="block text-sm font-medium text-gray-700 mb-1">
+                                                        Total Partidos
+                                                    </label>
+                                                    <input type="number" name="away_first_half_winner_total" id="away_first_half_winner_total"
+                                                           min="0" value="{{ old('away_first_half_winner_total') }}"
+                                                           placeholder="opcional"
+                                                           class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-purple-500 focus:border-purple-500">
+                                                    @error('away_first_half_winner_total')
+                                                        <p class="mt-1 text-xs text-red-600">{{ $message }}</p>
+                                                    @enderror
+                                                </div>
                                             </div>
-                                            <div>
-                                                <label for="away_first_half_loser_total" class="block text-sm font-medium text-gray-700 mb-1">
-                                                    Total Partidos
-                                                </label>
-                                                <input type="number" name="away_first_half_loser_total" id="away_first_half_loser_total"
-                                                       min="1" required value="{{ old('away_first_half_loser_total') }}"
-                                                       class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-purple-500 focus:border-purple-500">
-                                                @error('away_first_half_loser_total')
-                                                    <p class="mt-1 text-xs text-red-600">{{ $message }}</p>
-                                                @enderror
+                                            <div class="mt-2 text-sm text-gray-500" id="away_first_half_winner_percentage">
+                                                Efectividad: -
                                             </div>
                                         </div>
-                                        <div class="mt-2 text-sm text-gray-500" id="away_first_half_loser_percentage">
-                                            Efectividad: -
-                                        </div>
-                                    </div>
 
-                                    <!-- Both Teams Score (Away) -->
-                                    <div class="bg-white border border-gray-200 rounded-lg p-4">
-                                        <h3 class="font-semibold text-gray-800 mb-4 flex items-center">
-                                            ⚽⚽ Ambos Equipos Anotan (Partidos del Visitante)
-                                        </h3>
-                                        <div class="grid grid-cols-2 gap-4">
-                                            <div>
-                                                <label for="away_both_teams_score_success" class="block text-sm font-medium text-gray-700 mb-1">
-                                                    Aciertos
-                                                </label>
-                                                <input type="number" name="away_both_teams_score_success" id="away_both_teams_score_success"
-                                                       min="0" required value="{{ old('away_both_teams_score_success') }}"
-                                                       class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-purple-500 focus:border-purple-500">
-                                                @error('away_both_teams_score_success')
-                                                    <p class="mt-1 text-xs text-red-600">{{ $message }}</p>
-                                                @enderror
+                                        <!-- Both Teams Score -->
+                                        <div class="bg-white border border-gray-200 rounded-lg p-4 mb-4">
+                                            <h4 class="font-medium text-gray-800 mb-3 flex items-center">
+                                                ⚽⚽ Ambos Equipos Anotan
+                                            </h4>
+                                            <div class="grid grid-cols-2 gap-4">
+                                                <div>
+                                                    <label for="away_both_teams_score_success" class="block text-sm font-medium text-gray-700 mb-1">
+                                                        Aciertos
+                                                    </label>
+                                                    <input type="number" name="away_both_teams_score_success" id="away_both_teams_score_success"
+                                                           min="0" value="{{ old('away_both_teams_score_success') }}"
+                                                           placeholder="opcional"
+                                                           class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-purple-500 focus:border-purple-500">
+                                                    @error('away_both_teams_score_success')
+                                                        <p class="mt-1 text-xs text-red-600">{{ $message }}</p>
+                                                    @enderror
+                                                </div>
+                                                <div>
+                                                    <label for="away_both_teams_score_total" class="block text-sm font-medium text-gray-700 mb-1">
+                                                        Total Partidos
+                                                    </label>
+                                                    <input type="number" name="away_both_teams_score_total" id="away_both_teams_score_total"
+                                                           min="0" value="{{ old('away_both_teams_score_total') }}"
+                                                           placeholder="opcional"
+                                                           class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-purple-500 focus:border-purple-500">
+                                                    @error('away_both_teams_score_total')
+                                                        <p class="mt-1 text-xs text-red-600">{{ $message }}</p>
+                                                    @enderror
+                                                </div>
                                             </div>
-                                            <div>
-                                                <label for="away_both_teams_score_total" class="block text-sm font-medium text-gray-700 mb-1">
-                                                    Total Partidos
-                                                </label>
-                                                <input type="number" name="away_both_teams_score_total" id="away_both_teams_score_total"
-                                                       min="1" required value="{{ old('away_both_teams_score_total') }}"
-                                                       class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-purple-500 focus:border-purple-500">
-                                                @error('away_both_teams_score_total')
-                                                    <p class="mt-1 text-xs text-red-600">{{ $message }}</p>
-                                                @enderror
+                                            <div class="mt-2 text-sm text-gray-500" id="away_both_teams_percentage">
+                                                Efectividad: -
                                             </div>
                                         </div>
-                                        <div class="mt-2 text-sm text-gray-500" id="away_both_teams_percentage">
-                                            Efectividad: -
-                                        </div>
-                                    </div>
 
-                                    <!-- No Wins (Optional) -->
-                                    <div class="bg-white border border-gray-200 rounded-lg p-4">
-                                        <h3 class="font-semibold text-gray-800 mb-4 flex items-center">
-                                            📉 Sin Victorias (Opcional)
-                                        </h3>
-                                        <div class="grid grid-cols-2 gap-4">
-                                            <div>
-                                                <label for="away_no_wins_success" class="block text-sm font-medium text-gray-700 mb-1">
-                                                    Aciertos
-                                                </label>
-                                                <input type="number" name="away_no_wins_success" id="away_no_wins_success"
-                                                       min="0" value="{{ old('away_no_wins_success') }}"
-                                                       class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-purple-500 focus:border-purple-500">
-                                                @error('away_no_wins_success')
-                                                    <p class="mt-1 text-xs text-red-600">{{ $message }}</p>
-                                                @enderror
+                                        <!-- Over 2.5 Goals -->
+                                        <div class="bg-white border border-gray-200 rounded-lg p-4 mb-4">
+                                            <h4 class="font-medium text-gray-800 mb-3 flex items-center">
+                                                📈 Más de 2.5 Goles
+                                            </h4>
+                                            <div class="grid grid-cols-2 gap-4">
+                                                <div>
+                                                    <label for="away_over_25_success" class="block text-sm font-medium text-gray-700 mb-1">
+                                                        Aciertos
+                                                    </label>
+                                                    <input type="number" name="away_over_25_success" id="away_over_25_success"
+                                                           min="0" value="{{ old('away_over_25_success') }}"
+                                                           placeholder="opcional"
+                                                           class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-purple-500 focus:border-purple-500">
+                                                    @error('away_over_25_success')
+                                                        <p class="mt-1 text-xs text-red-600">{{ $message }}</p>
+                                                    @enderror
+                                                </div>
+                                                <div>
+                                                    <label for="away_over_25_total" class="block text-sm font-medium text-gray-700 mb-1">
+                                                        Total Partidos
+                                                    </label>
+                                                    <input type="number" name="away_over_25_total" id="away_over_25_total"
+                                                           min="0" value="{{ old('away_over_25_total') }}"
+                                                           placeholder="opcional"
+                                                           class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-purple-500 focus:border-purple-500">
+                                                    @error('away_over_25_total')
+                                                        <p class="mt-1 text-xs text-red-600">{{ $message }}</p>
+                                                    @enderror
+                                                </div>
                                             </div>
-                                            <div>
-                                                <label for="away_no_wins_total" class="block text-sm font-medium text-gray-700 mb-1">
-                                                    Total Partidos
-                                                </label>
-                                                <input type="number" name="away_no_wins_total" id="away_no_wins_total"
-                                                       min="0" value="{{ old('away_no_wins_total') }}"
-                                                       class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-purple-500 focus:border-purple-500">
-                                                @error('away_no_wins_total')
-                                                    <p class="mt-1 text-xs text-red-600">{{ $message }}</p>
-                                                @enderror
+                                            <div class="mt-2 text-sm text-gray-500" id="away_over_25_percentage">
+                                                Efectividad: -
                                             </div>
                                         </div>
-                                        <div class="mt-2 text-sm text-gray-500" id="away_no_wins_percentage">
-                                            Efectividad: -
+
+                                        <!-- Under 2.5 Goals -->
+                                        <div class="bg-white border border-gray-200 rounded-lg p-4 mb-4">
+                                            <h4 class="font-medium text-gray-800 mb-3 flex items-center">
+                                                📉 Menos de 2.5 Goles
+                                            </h4>
+                                            <div class="grid grid-cols-2 gap-4">
+                                                <div>
+                                                    <label for="away_under_25_success" class="block text-sm font-medium text-gray-700 mb-1">
+                                                        Aciertos
+                                                    </label>
+                                                    <input type="number" name="away_under_25_success" id="away_under_25_success"
+                                                           min="0" value="{{ old('away_under_25_success') }}"
+                                                           placeholder="opcional"
+                                                           class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-purple-500 focus:border-purple-500">
+                                                    @error('away_under_25_success')
+                                                        <p class="mt-1 text-xs text-red-600">{{ $message }}</p>
+                                                    @enderror
+                                                </div>
+                                                <div>
+                                                    <label for="away_under_25_total" class="block text-sm font-medium text-gray-700 mb-1">
+                                                        Total Partidos
+                                                    </label>
+                                                    <input type="number" name="away_under_25_total" id="away_under_25_total"
+                                                           min="0" value="{{ old('away_under_25_total') }}"
+                                                           placeholder="opcional"
+                                                           class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-purple-500 focus:border-purple-500">
+                                                    @error('away_under_25_total')
+                                                        <p class="mt-1 text-xs text-red-600">{{ $message }}</p>
+                                                    @enderror
+                                                </div>
+                                            </div>
+                                            <div class="mt-2 text-sm text-gray-500" id="away_under_25_percentage">
+                                                Efectividad: -
+                                            </div>
                                         </div>
+
                                     </div>
                                 </div>
 
@@ -264,31 +309,46 @@
                             </h3>
                             <div class="space-y-3 text-sm text-gray-600">
                                 <p>
-                                    <strong>Rachas del Visitante:</strong> Estadísticas específicas del equipo visitante para los últimos partidos jugados fuera de casa.
+                                    <strong>Estadísticas Generales:</strong> Rendimiento del equipo considerando todos sus partidos (local y visitante).
                                 </p>
                                 <p>
-                                    <strong>Estadísticas Adicionales:</strong> Incluye rachas como "primer gol en contra" y "perdedor del primer tiempo".
+                                    <strong>Dos Tipos de Formato:</strong>
                                 </p>
+                                <ul class="ml-4 space-y-1">
+                                    <li>• <strong>Rachas Simples:</strong> Número de partidos consecutivos (ej: 2 victorias seguidas)</li>
+                                    <li>• <strong>Rachas con Ratio:</strong> Aciertos/Total (ej: 6 de 8 partidos = 75%)</li>
+                                </ul>
                             </div>
 
-                            <div class="mt-6 p-4 bg-purple-100 rounded-lg">
-                                <h4 class="font-semibold text-purple-800 mb-2">💡 Ejemplo</h4>
-                                <div class="text-sm text-purple-700 space-y-2">
-                                    <div><strong>Primer Gol:</strong> 2/5 = 40%</div>
-                                    <div><strong>1er Gol Contra:</strong> 4/5 = 80%</div>
-                                    <div><strong>1T Ganador:</strong> 1/5 = 20%</div>
-                                    <div><strong>1T Perdedor:</strong> 3/5 = 60%</div>
-                                    <div><strong>Ambos Anotan:</strong> 4/5 = 80%</div>
+                            <div class="mt-6 p-4 bg-green-100 rounded-lg">
+                                <h4 class="font-semibold text-green-800 mb-2">💡 Ejemplo Rachas Simples</h4>
+                                <div class="text-sm text-green-700 space-y-2">
+                                    <div><strong>Victorias:</strong> 2 (2 victorias consecutivas)</div>
+                                    <div><strong>Derrotas:</strong> 1 (1 derrota reciente)</div>
+                                    <div><strong>Sin Derrotas:</strong> 4 (4 partidos sin perder)</div>
+                                    <div><strong>Ninguna Portería a Cero:</strong> 3 (3 partidos sin portería imbatida)</div>
                                 </div>
                             </div>
 
-                            <div class="mt-4 p-4 bg-yellow-100 rounded-lg">
-                                <h4 class="font-semibold text-yellow-800 mb-2">📋 Consideraciones</h4>
-                                <ul class="text-sm text-yellow-700 space-y-1">
-                                    <li>• Solo partidos como visitante</li>
-                                    <li>• Las rachas de visitante suelen ser menores</li>
-                                    <li>• "Primer gol en contra" es importante para underdog</li>
-                                    <li>• Factor desventaja por jugar fuera de casa</li>
+                            <div class="mt-4 p-4 bg-purple-100 rounded-lg">
+                                <h4 class="font-semibold text-purple-800 mb-2">🎯 Ejemplo Rachas con Ratio</h4>
+                                <div class="text-sm text-purple-700 space-y-2">
+                                    <div><strong>Primero en Marcar:</strong> 6/8 = 75%</div>
+                                    <div><strong>1T Ganador:</strong> 4/8 = 50%</div>
+                                    <div><strong>Ambos Anotan:</strong> 5/10 = 50%</div>
+                                    <div><strong>Más de 2.5:</strong> 3/8 = 37.5%</div>
+                                    <div><strong>Menos de 2.5:</strong> 5/8 = 62.5%</div>
+                                </div>
+                            </div>
+
+                            <div class="mt-4 p-4 bg-blue-100 rounded-lg">
+                                <h4 class="font-semibold text-blue-800 mb-2">📋 Consideraciones</h4>
+                                <ul class="text-sm text-blue-700 space-y-1">
+                                    <li>• Todos los partidos del equipo (no solo local/visitante)</li>
+                                    <li>• Últimos 8-12 partidos recomendado</li>
+                                    <li>• <strong>Todos los campos son opcionales</strong> - deja vacío si no hay racha</li>
+                                    <li>• Solo llena los campos donde el equipo tenga rachas activas</li>
+                                    <li>• Rachas más largas = mayor confianza en predicción</li>
                                 </ul>
                             </div>
                         </div>
@@ -304,7 +364,7 @@
             const total = parseInt(document.getElementById(totalId).value) || 0;
             const display = document.getElementById(displayId);
 
-            if (total > 0) {
+            if (total > 0 && success >= 0) {
                 const percentage = ((success / total) * 100).toFixed(1);
                 display.textContent = `Efectividad: ${success}/${total} = ${percentage}%`;
 
@@ -322,42 +382,78 @@
             }
         }
 
-        // Add event listeners for real-time calculation
-        const streakPairs = [
-            ['away_first_to_score_success', 'away_first_to_score_total', 'away_first_score_percentage'],
-            ['away_first_to_concede_success', 'away_first_to_concede_total', 'away_first_concede_percentage'],
-            ['away_first_half_winner_success', 'away_first_half_winner_total', 'away_first_half_winner_percentage'],
-            ['away_first_half_loser_success', 'away_first_half_loser_total', 'away_first_half_loser_percentage'],
-            ['away_both_teams_score_success', 'away_both_teams_score_total', 'away_both_teams_percentage'],
-            ['away_no_wins_success', 'away_no_wins_total', 'away_no_wins_percentage']
-        ];
-
-        streakPairs.forEach(([successId, totalId, displayId]) => {
-            [successId, totalId].forEach(id => {
-                document.getElementById(id).addEventListener('input', () => {
-                    calculatePercentage(successId, totalId, displayId);
-                });
-            });
-        });
-
         // Validation: success cannot be greater than total
         function validateInput(successId, totalId) {
             const successInput = document.getElementById(successId);
             const totalInput = document.getElementById(totalId);
 
-            successInput.addEventListener('input', function() {
-                const success = parseInt(this.value) || 0;
-                const total = parseInt(totalInput.value) || 0;
+            if (successInput && totalInput) {
+                successInput.addEventListener('input', function() {
+                    const success = parseInt(this.value) || 0;
+                    const total = parseInt(totalInput.value) || 0;
 
-                if (total > 0 && success > total) {
-                    this.value = total;
-                }
-            });
+                    if (total > 0 && success > total) {
+                        this.value = total;
+                    }
+                });
+            }
         }
 
-        // Apply validation to all pairs
-        streakPairs.forEach(([successId, totalId]) => {
-            validateInput(successId, totalId);
+        // Add event listeners for real-time calculation - First to Score
+        ['away_first_to_score_success', 'away_first_to_score_total'].forEach(id => {
+            const element = document.getElementById(id);
+            if (element) {
+                element.addEventListener('input', () => {
+                    calculatePercentage('away_first_to_score_success', 'away_first_to_score_total', 'away_first_score_percentage');
+                });
+            }
         });
+
+        // First Half Winner
+        ['away_first_half_winner_success', 'away_first_half_winner_total'].forEach(id => {
+            const element = document.getElementById(id);
+            if (element) {
+                element.addEventListener('input', () => {
+                    calculatePercentage('away_first_half_winner_success', 'away_first_half_winner_total', 'away_first_half_winner_percentage');
+                });
+            }
+        });
+
+        // Both Teams Score
+        ['away_both_teams_score_success', 'away_both_teams_score_total'].forEach(id => {
+            const element = document.getElementById(id);
+            if (element) {
+                element.addEventListener('input', () => {
+                    calculatePercentage('away_both_teams_score_success', 'away_both_teams_score_total', 'away_both_teams_percentage');
+                });
+            }
+        });
+
+        // Over 2.5 Goals
+        ['away_over_25_success', 'away_over_25_total'].forEach(id => {
+            const element = document.getElementById(id);
+            if (element) {
+                element.addEventListener('input', () => {
+                    calculatePercentage('away_over_25_success', 'away_over_25_total', 'away_over_25_percentage');
+                });
+            }
+        });
+
+        // Under 2.5 Goals
+        ['away_under_25_success', 'away_under_25_total'].forEach(id => {
+            const element = document.getElementById(id);
+            if (element) {
+                element.addEventListener('input', () => {
+                    calculatePercentage('away_under_25_success', 'away_under_25_total', 'away_under_25_percentage');
+                });
+            }
+        });
+
+        // Apply validation to all ratio pairs
+        validateInput('away_first_to_score_success', 'away_first_to_score_total');
+        validateInput('away_first_half_winner_success', 'away_first_half_winner_total');
+        validateInput('away_both_teams_score_success', 'away_both_teams_score_total');
+        validateInput('away_over_25_success', 'away_over_25_total');
+        validateInput('away_under_25_success', 'away_under_25_total');
     </script>
 </x-app-layout>

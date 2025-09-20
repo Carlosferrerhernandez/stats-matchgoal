@@ -90,15 +90,23 @@ class MatchCreatorController extends Controller
     public function storeStep3(Request $request)
     {
         $validated = $request->validate([
-            // Rachas principales para el algoritmo
-            'home_first_to_score_success' => 'required|integer|min:0',
-            'home_first_to_score_total' => 'required|integer|min:1',
-            'home_first_half_winner_success' => 'required|integer|min:0',
-            'home_first_half_winner_total' => 'required|integer|min:1',
-            'home_both_teams_score_success' => 'required|integer|min:0',
-            'home_both_teams_score_total' => 'required|integer|min:1',
-            'home_no_defeats_success' => 'nullable|integer|min:0',
-            'home_no_defeats_total' => 'nullable|integer|min:0',
+            // Rachas simples (número consecutivo)
+            'home_wins_streak' => 'nullable|integer|min:0',
+            'home_defeats_streak' => 'nullable|integer|min:0',
+            'home_no_defeats_streak' => 'nullable|integer|min:0',
+            'home_no_clean_sheet_streak' => 'nullable|integer|min:0',
+
+            // Rachas con formato (aciertos/total)
+            'home_first_to_score_success' => 'nullable|integer|min:0',
+            'home_first_to_score_total' => 'nullable|integer|min:0',
+            'home_first_half_winner_success' => 'nullable|integer|min:0',
+            'home_first_half_winner_total' => 'nullable|integer|min:0',
+            'home_both_teams_score_success' => 'nullable|integer|min:0',
+            'home_both_teams_score_total' => 'nullable|integer|min:0',
+            'home_over_25_success' => 'nullable|integer|min:0',
+            'home_over_25_total' => 'nullable|integer|min:0',
+            'home_under_25_success' => 'nullable|integer|min:0',
+            'home_under_25_total' => 'nullable|integer|min:0',
         ]);
 
         $matchData = session('match_data');
@@ -123,18 +131,23 @@ class MatchCreatorController extends Controller
     public function storeStep4(Request $request)
     {
         $validated = $request->validate([
-            'away_first_to_score_success' => 'required|integer|min:0',
-            'away_first_to_score_total' => 'required|integer|min:1',
-            'away_first_to_concede_success' => 'required|integer|min:0',
-            'away_first_to_concede_total' => 'required|integer|min:1',
-            'away_first_half_winner_success' => 'required|integer|min:0',
-            'away_first_half_winner_total' => 'required|integer|min:1',
-            'away_first_half_loser_success' => 'required|integer|min:0',
-            'away_first_half_loser_total' => 'required|integer|min:1',
-            'away_both_teams_score_success' => 'required|integer|min:0',
-            'away_both_teams_score_total' => 'required|integer|min:1',
-            'away_no_wins_success' => 'nullable|integer|min:0',
-            'away_no_wins_total' => 'nullable|integer|min:0',
+            // Rachas simples (número consecutivo)
+            'away_wins_streak' => 'nullable|integer|min:0',
+            'away_defeats_streak' => 'nullable|integer|min:0',
+            'away_no_defeats_streak' => 'nullable|integer|min:0',
+            'away_no_clean_sheet_streak' => 'nullable|integer|min:0',
+
+            // Rachas con formato (aciertos/total)
+            'away_first_to_score_success' => 'nullable|integer|min:0',
+            'away_first_to_score_total' => 'nullable|integer|min:0',
+            'away_first_half_winner_success' => 'nullable|integer|min:0',
+            'away_first_half_winner_total' => 'nullable|integer|min:0',
+            'away_both_teams_score_success' => 'nullable|integer|min:0',
+            'away_both_teams_score_total' => 'nullable|integer|min:0',
+            'away_over_25_success' => 'nullable|integer|min:0',
+            'away_over_25_total' => 'nullable|integer|min:0',
+            'away_under_25_success' => 'nullable|integer|min:0',
+            'away_under_25_total' => 'nullable|integer|min:0',
         ]);
 
         $matchData = session('match_data');
@@ -214,10 +227,25 @@ class MatchCreatorController extends Controller
             // Crear el partido definitivo y las estadísticas
             $match = $this->createMatchFromSessionData($matchData, true);
 
+            // Verificar si hay predicción disponible
+            $analysisService = new MarketAnalysisService();
+            $prediction = null;
+
+            try {
+                $prediction = $analysisService->analyzeMatch($match, auth()->user());
+            } catch (\Exception $e) {
+                // Si no se puede generar predicción, continuar guardando el partido
+            }
+
             // Limpiar sesión
             session()->forget('match_data');
 
-            return redirect()->route('predictions')->with('success', 'Partido creado y analizado exitosamente. ¡Predicción generada!');
+            // Mensaje personalizado según si hay predicción o no
+            if ($prediction && !empty($prediction['recommendations'])) {
+                return redirect()->route('predictions')->with('success', 'Partido creado y analizado exitosamente. ¡Predicción generada!');
+            } else {
+                return redirect()->route('predictions')->with('success', 'Partido creado exitosamente. El partido ha sido guardado para análisis futuro.');
+            }
 
         } catch (\Exception $e) {
             return back()->with('error', 'Error al guardar: ' . $e->getMessage());
