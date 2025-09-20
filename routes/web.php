@@ -36,13 +36,31 @@ Route::middleware('auth')->group(function () {
     Route::get('/bets/create', [BetController::class, 'create'])->name('bets.create');
     Route::post('/bets', [BetController::class, 'store'])->name('bets.store');
 
-    Route::get('/leagues', [LeagueController::class, 'index'])->name('leagues.index');
-    Route::get('/leagues/create', [LeagueController::class, 'create'])->name('leagues.create');
-    Route::post('/leagues', [LeagueController::class, 'store'])->name('leagues.store');
+    // Rutas de Ligas
+    Route::resource('leagues', LeagueController::class);
 
-    Route::get('/teams', [TeamController::class, 'index'])->name('teams.index');
-    Route::get('/teams/create', [TeamController::class, 'create'])->name('teams.create');
-    Route::post('/teams', [TeamController::class, 'store'])->name('teams.store');
+    // Rutas de Equipos
+    Route::resource('teams', TeamController::class);
+
+    // Rutas del flujo de creación de partidos
+    Route::prefix('matches/create')->name('matches.create.')->group(function () {
+        Route::get('/', [App\Http\Controllers\MatchCreatorController::class, 'index'])->name('index');
+        Route::get('/step1', [App\Http\Controllers\MatchCreatorController::class, 'step1'])->name('step1');
+        Route::post('/step1', [App\Http\Controllers\MatchCreatorController::class, 'storeStep1'])->name('step1.store');
+        Route::get('/step2', [App\Http\Controllers\MatchCreatorController::class, 'step2'])->name('step2');
+        Route::post('/step2', [App\Http\Controllers\MatchCreatorController::class, 'storeStep2'])->name('step2.store');
+        Route::get('/step3', [App\Http\Controllers\MatchCreatorController::class, 'step3'])->name('step3');
+        Route::post('/step3', [App\Http\Controllers\MatchCreatorController::class, 'storeStep3'])->name('step3.store');
+        Route::get('/step4', [App\Http\Controllers\MatchCreatorController::class, 'step4'])->name('step4');
+        Route::post('/step4', [App\Http\Controllers\MatchCreatorController::class, 'storeStep4'])->name('step4.store');
+        Route::get('/step5', [App\Http\Controllers\MatchCreatorController::class, 'step5'])->name('step5');
+        Route::post('/step5', [App\Http\Controllers\MatchCreatorController::class, 'storeStep5'])->name('step5.store');
+        Route::get('/analyze', [App\Http\Controllers\MatchCreatorController::class, 'analyze'])->name('analyze');
+        Route::post('/confirm', [App\Http\Controllers\MatchCreatorController::class, 'confirm'])->name('confirm');
+    });
+
+    // API para obtener equipos por liga
+    Route::get('/api/teams-by-league', [App\Http\Controllers\MatchCreatorController::class, 'getTeamsByLeague'])->name('api.teams-by-league');
 });
 
 require __DIR__.'/auth.php';

@@ -21,6 +21,7 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
+        'bank',
     ];
 
     /**
@@ -41,5 +42,21 @@ class User extends Authenticatable
     protected $casts = [
         'email_verified_at' => 'datetime',
         'password' => 'hashed',
+        'bank' => 'decimal:2',
     ];
+
+    public function bets()
+    {
+        return $this->hasMany(Bet::class);
+    }
+
+    public function predictions()
+    {
+        return $this->hasMany(Prediction::class);
+    }
+
+    public function settings()
+    {
+        return $this->hasOne(UserSetting::class);
+    }
 }

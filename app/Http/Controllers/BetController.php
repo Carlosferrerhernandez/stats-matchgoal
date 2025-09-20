@@ -2,9 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Bet;
 use App\Models\Channel;
 use App\Models\League;
 use App\Models\Team;
+use App\Models\Prediction;
 use Illuminate\Http\Request;
 
 class BetController extends Controller
@@ -57,5 +59,14 @@ class BetController extends Controller
         return redirect()->route('predictions')->with('success', 'Apuesta registrada.');
     }
 
+    public function showPredictions()
+    {
+        $predictions = auth()->user()->predictions()
+            ->with(['match.homeTeam', 'match.awayTeam', 'market'])
+            ->orderBy('created_at', 'desc')
+            ->paginate(15);
+
+        return view('predictions.index', compact('predictions'));
+    }
 }
 

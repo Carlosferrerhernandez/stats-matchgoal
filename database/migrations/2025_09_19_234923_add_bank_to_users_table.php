@@ -11,12 +11,8 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('leagues', function (Blueprint $table) {
-            $table->id();
-            $table->string('name');
-            $table->string('country')->nullable();
-            $table->string('season')->nullable();
-            $table->timestamps();
+        Schema::table('users', function (Blueprint $table) {
+            $table->decimal('bank', 10, 2)->default(1000.00)->after('email_verified_at');
         });
     }
 
@@ -25,6 +21,8 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('leagues');
+        Schema::table('users', function (Blueprint $table) {
+            $table->dropColumn('bank');
+        });
     }
 };
