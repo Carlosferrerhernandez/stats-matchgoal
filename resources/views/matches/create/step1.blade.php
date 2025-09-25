@@ -27,6 +27,29 @@
                             <form method="POST" action="{{ route('matches.create.step1.store') }}" id="step1Form">
                                 @csrf
 
+                                <!-- URL del Partido (Scraping) -->
+                                <div class="mb-6">
+                                    <label for="match_url" class="block text-sm font-medium text-gray-700 mb-2">
+                                        URL del Partido (Opcional)
+                                    </label>
+                                    <div class="flex gap-2">
+                                        <input type="url" name="match_url" id="match_url"
+                                               placeholder="https://ejemplo.com/partido-real-madrid-vs-barcelona"
+                                               value="{{ old('match_url') }}"
+                                               class="flex-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500">
+                                        <button type="button" id="scrapeBtn"
+                                                class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded">
+                                            📡 Extraer
+                                        </button>
+                                    </div>
+                                    <p class="mt-1 text-xs text-gray-500">
+                                        Pega la URL del partido para llenar automáticamente los datos
+                                    </p>
+                                    @error('match_url')
+                                        <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                                    @enderror
+                                </div>
+
                                 <!-- Liga Selection -->
                                 <div class="mb-6">
                                     <label for="league_id" class="block text-sm font-medium text-gray-700 mb-2">
@@ -79,9 +102,8 @@
                                     <label for="match_date" class="block text-sm font-medium text-gray-700 mb-2">
                                         Fecha del Partido
                                     </label>
-                                    <input type="datetime-local" name="match_date" id="match_date" required
+                                    <input type="date" name="match_date" id="match_date" required
                                            value="{{ old('match_date') }}"
-                                           min="{{ date('Y-m-d\TH:i') }}"
                                            class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500">
                                     @error('match_date')
                                         <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
@@ -109,6 +131,9 @@
                             </h3>
                             <div class="space-y-3 text-sm text-gray-600">
                                 <p>
+                                    <strong>URL del Partido:</strong> Pega el enlace de sitios deportivos para autocompletar datos.
+                                </p>
+                                <p>
                                     <strong>Liga:</strong> Selecciona la competición donde se jugará el partido.
                                 </p>
                                 <p>
@@ -122,6 +147,7 @@
                             <div class="mt-6 p-4 bg-blue-100 rounded-lg">
                                 <h4 class="font-semibold text-blue-800 mb-2">💡 Consejos</h4>
                                 <ul class="text-sm text-blue-700 space-y-1">
+                                    <li>• Usa URLs de sitios como Flashscore, Bet365, Marca, AS</li>
                                     <li>• La condición de local/visitante afecta las estadísticas</li>
                                     <li>• Asegúrate de que la fecha sea correcta</li>
                                     <li>• Los equipos deben pertenecer a la liga seleccionada</li>
@@ -135,6 +161,72 @@
     </div>
 
     <script>
+        // Scraping functionality
+        document.getElementById('scrapeBtn').addEventListener('click', function() {
+            const url = document.getElementById('match_url').value;
+
+            if (!url) {
+                alert('Por favor ingresa una URL válida');
+                return;
+            }
+
+            // Show loading state
+            this.disabled = true;
+            this.innerHTML = '⏳ Extrayendo...';
+
+            // Call scraping endpoint
+            fetch('{{ route('api.scrape-match') }}', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                },
+                body: JSON.stringify({ url: url })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.error) {
+                    alert('Error: ' + data.error);
+                } else {
+                    // Fill form with scraped data
+                    fillFormWithScrapedData(data);
+                    alert('✅ Datos extraídos correctamente');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Error al extraer los datos. Verifica la URL.');
+            })
+            .finally(() => {
+                // Reset button
+                this.disabled = false;
+                this.innerHTML = '📡 Extraer';
+            });
+        });
+
+        function fillFormWithScrapedData(data) {
+            // Fill league
+            if (data.league_id) {
+                document.getElementById('league_id').value = data.league_id;
+                document.getElementById('league_id').dispatchEvent(new Event('change'));
+            }
+
+            // Fill date
+            if (data.match_date) {
+                document.getElementById('match_date').value = data.match_date;
+            }
+
+            // Wait for teams to load, then fill them
+            setTimeout(() => {
+                if (data.home_team_id) {
+                    document.getElementById('home_team_id').value = data.home_team_id;
+                }
+                if (data.away_team_id) {
+                    document.getElementById('away_team_id').value = data.away_team_id;
+                }
+            }, 1000);
+        }
+
         // Load teams when league is selected
         document.getElementById('league_id').addEventListener('change', function() {
             const leagueId = this.value;

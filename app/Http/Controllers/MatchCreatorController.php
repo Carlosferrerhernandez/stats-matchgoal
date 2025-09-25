@@ -30,7 +30,7 @@ class MatchCreatorController extends Controller
             'league_id' => 'required|exists:leagues,id',
             'home_team_id' => 'required|exists:teams,id',
             'away_team_id' => 'required|exists:teams,id|different:home_team_id',
-            'match_date' => 'required|date|after:now'
+            'match_date' => 'required|date'
         ]);
 
         // Guardar en sesión para el flujo multi-paso
@@ -307,6 +307,22 @@ class MatchCreatorController extends Controller
                 'last_updated' => now()
             ]
         );
+    }
+
+    public function scrapeMatch(Request $request)
+    {
+        $request->validate([
+            'url' => 'required|url'
+        ]);
+
+        try {
+            $scrapingService = new \App\Services\MatchScrapingService();
+            $data = $scrapingService->scrapeMatchData($request->url);
+
+            return response()->json($data);
+        } catch (\Exception $e) {
+            return response()->json(['error' => 'Error al procesar la URL: ' . $e->getMessage()], 500);
+        }
     }
 
     public function getTeamsByLeague(Request $request)

@@ -61,6 +61,13 @@ Route::middleware('auth')->group(function () {
 
     // API para obtener equipos por liga
     Route::get('/api/teams-by-league', [App\Http\Controllers\MatchCreatorController::class, 'getTeamsByLeague'])->name('api.teams-by-league');
+
+    // API para scraping de partidos
+    Route::post('/api/scrape-match', [App\Http\Controllers\MatchCreatorController::class, 'scrapeMatch'])->name('api.scrape-match');
+
+    // Rutas de prueba de scraping (solo para desarrollo)
+    Route::get('/test-scraping', [App\Http\Controllers\ScrapingTestController::class, 'form'])->name('test.scraping.form');
+    Route::post('/test-scraping', [App\Http\Controllers\ScrapingTestController::class, 'testSofaScore'])->name('test.scraping.test');
 });
 
 require __DIR__.'/auth.php';
